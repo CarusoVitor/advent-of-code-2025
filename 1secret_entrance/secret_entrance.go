@@ -39,7 +39,7 @@ func countZeroReset(rotations []string, start int) (int, error) {
 		if direction == 'L' {
 			value = -value
 		}
-		acc = (acc + value) % 100
+		acc = ((acc+value)%100 + 100) % 100
 		if acc == 0 {
 			zeroCount++
 		}

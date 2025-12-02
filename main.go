@@ -7,5 +7,5 @@ import (
 )
 
 func main() {
-	fmt.Println(secretentrance.PartOne())
+	fmt.Println(secretentrance.PartTwo())
 }

@@ -1,28 +1,10 @@
 package secretentrance
 
 import (
-	"bufio"
-	"io"
-	"os"
 	"strconv"
+
+	filehandling "github.com/CarusoVitor/advent-of-code-2025/file_handling"
 )
-
-func openFile(path string) (io.Reader, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	return file, nil
-}
-
-func extractSlice(rd io.Reader) []string {
-	scanner := bufio.NewScanner(rd)
-	lines := make([]string, 0, 512)
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-	return lines
-}
 
 func countZeroReset(rotations []string, start int) (int, error) {
 	zeroCount := 0
@@ -81,11 +63,11 @@ func countZeroClicks(rotations []string, start int) (int, error) {
 }
 
 func PartOne() int {
-	file, err := openFile("1secret_entrance/input.txt")
+	file, err := filehandling.OpenFile("1secret_entrance/input.txt")
 	if err != nil {
 		panic(err)
 	}
-	input := extractSlice(file)
+	input := filehandling.ExtractSliceNewLine(file)
 	res, err := countZeroReset(input, 50)
 	if err != nil {
 		panic(err)
@@ -94,11 +76,11 @@ func PartOne() int {
 }
 
 func PartTwo() int {
-	file, err := openFile("1secret_entrance/input.txt")
+	file, err := filehandling.OpenFile("1secret_entrance/input.txt")
 	if err != nil {
 		panic(err)
 	}
-	input := extractSlice(file)
+	input := filehandling.ExtractSliceNewLine(file)
 	res, err := countZeroClicks(input, 50)
 	if err != nil {
 		panic(err)

@@ -19,9 +19,9 @@ func maxNumWithLen(value int) int {
 	}
 	result := 1
 	for range value {
-		result = result*10 + 9
+		result = result * 10
 	}
-	return result
+	return result - 1
 }
 
 func minNumWithLen(value int) int {
@@ -35,8 +35,8 @@ func minNumWithLen(value int) int {
 	return res
 }
 func (id idRange) split() (*idRange, *idRange) {
-	lowerMax := min(id.upper, maxNumWithLen(len(fmt.Sprint(id.lower))))
-	upperMin := max(id.lower, minNumWithLen(len(fmt.Sprint(id.upper))))
+	lowerMax := min(id.upper, maxNumWithLen(id.lowerSize()))
+	upperMin := max(id.lower, minNumWithLen(id.upperSize()))
 	if lowerMax == id.upper && upperMin == id.lower {
 		return nil, nil
 	}
@@ -61,13 +61,21 @@ func (id idRange) upperSize() int {
 	return len(fmt.Sprint(id.upper))
 }
 
-func sumInvalidIdsFromRange(idRangeObj idRange) int {
+func sumInvalidIdsFromRange(idRangeObj idRange, splits int) int {
 	sum := 0
-	halfSize := idRangeObj.lowerSize() / 2
+	partSize := idRangeObj.lowerSize() / splits
+
 	for i := idRangeObj.lower; i <= idRangeObj.upper; i++ {
-		left := fmt.Sprint(i)[:halfSize]
-		right := fmt.Sprint(i)[halfSize:]
-		if left == right {
+		numStr := fmt.Sprint(i)
+
+		first := numStr[:partSize]
+		var charIdx int
+		for charIdx = partSize; charIdx < len(numStr); charIdx += partSize {
+			if numStr[charIdx:charIdx+partSize] != first {
+				break
+			}
+		}
+		if charIdx == len(numStr) {
 			sum += i
 		}
 	}
@@ -87,13 +95,13 @@ func sumInvalidIdsFromLimits(lower, upper int) int {
 	sum := 0
 	if lowerRange != nil && upperRange != nil {
 		if !isLowerOdd {
-			sum += sumInvalidIdsFromRange(*lowerRange)
+			sum += sumInvalidIdsFromRange(*lowerRange, 2)
 		}
 		if !isUpperOdd {
-			sum += sumInvalidIdsFromRange(*upperRange)
+			sum += sumInvalidIdsFromRange(*upperRange, 2)
 		}
 	} else {
-		sum += sumInvalidIdsFromRange(idRangeObj)
+		sum += sumInvalidIdsFromRange(idRangeObj, 2)
 	}
 	return sum
 }

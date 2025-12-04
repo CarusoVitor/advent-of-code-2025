@@ -7,5 +7,5 @@ import (
 )
 
 func main() {
-	fmt.Println(giftshop.PartOne())
+	fmt.Println(giftshop.PartTwo())
 }

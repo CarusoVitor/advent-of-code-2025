@@ -34,6 +34,7 @@ func minNumWithLen(value int) int {
 	}
 	return res
 }
+
 func (id idRange) split() (*idRange, *idRange) {
 	lowerMax := min(id.upper, maxNumWithLen(id.lowerSize()))
 	upperMin := max(id.lower, minNumWithLen(id.upperSize()))
@@ -61,28 +62,34 @@ func (id idRange) upperSize() int {
 	return len(fmt.Sprint(id.upper))
 }
 
-func sumInvalidIdsFromRange(idRangeObj idRange, splits int) int {
+func isIdInvalid(partSize int, word string) bool {
+	first := word[:partSize]
+	var charIdx int
+	for charIdx = partSize; charIdx < len(word); charIdx += partSize {
+		if word[charIdx:charIdx+partSize] != first {
+			break
+		}
+	}
+	return charIdx == len(word)
+
+}
+
+func sumInvalidIdsFromRange(idRangeObj idRange, splits []int) int {
 	sum := 0
-	partSize := idRangeObj.lowerSize() / splits
-
 	for i := idRangeObj.lower; i <= idRangeObj.upper; i++ {
-		numStr := fmt.Sprint(i)
-
-		first := numStr[:partSize]
-		var charIdx int
-		for charIdx = partSize; charIdx < len(numStr); charIdx += partSize {
-			if numStr[charIdx:charIdx+partSize] != first {
+		for _, split := range splits {
+			partSize := idRangeObj.lowerSize() / split
+			numStr := fmt.Sprint(i)
+			if isIdInvalid(partSize, numStr) {
+				sum += i
 				break
 			}
-		}
-		if charIdx == len(numStr) {
-			sum += i
 		}
 	}
 	return sum
 }
 
-func sumInvalidIdsFromLimits(lower, upper int) int {
+func sumInvalidIdsPartOne(lower, upper int) int {
 	idRangeObj := idRange{lower, upper}
 
 	isLowerOdd := idRangeObj.lowerSize()%2 != 0
@@ -95,18 +102,54 @@ func sumInvalidIdsFromLimits(lower, upper int) int {
 	sum := 0
 	if lowerRange != nil && upperRange != nil {
 		if !isLowerOdd {
-			sum += sumInvalidIdsFromRange(*lowerRange, 2)
+			sum += sumInvalidIdsFromRange(*lowerRange, []int{2})
 		}
 		if !isUpperOdd {
-			sum += sumInvalidIdsFromRange(*upperRange, 2)
+			sum += sumInvalidIdsFromRange(*upperRange, []int{2})
 		}
 	} else {
-		sum += sumInvalidIdsFromRange(idRangeObj, 2)
+		sum += sumInvalidIdsFromRange(idRangeObj, []int{2})
 	}
 	return sum
 }
 
-func sumInvalidIds(ranges []string) int {
+func divisorsExceptOne(n int) []int {
+	if n <= 1 {
+		return []int{}
+	}
+
+	divs := []int{}
+	for i := 1; i*i <= n; i++ {
+		if n%i == 0 {
+			// skip 1
+			if i != 1 {
+				divs = append(divs, i)
+			}
+			if i != n/i && n/i != 1 {
+				divs = append(divs, n/i)
+			}
+		}
+	}
+
+	return divs
+}
+
+func sumInvalidIdsPartTwo(lower, upper int) int {
+	idRangeObj := idRange{lower, upper}
+
+	lowerRange, upperRange := idRangeObj.split()
+
+	sum := 0
+	if lowerRange != nil && upperRange != nil {
+		sum += sumInvalidIdsFromRange(*lowerRange, divisorsExceptOne(idRangeObj.lowerSize()))
+		sum += sumInvalidIdsFromRange(*upperRange, divisorsExceptOne(idRangeObj.upperSize()))
+	} else {
+		sum += sumInvalidIdsFromRange(idRangeObj, divisorsExceptOne(idRangeObj.upperSize()))
+	}
+	return sum
+}
+
+func sumInvalidIds(ranges []string, exactTwice bool) int {
 	sum := 0
 	for _, item := range ranges {
 		values := strings.Split(item, `-`)
@@ -118,7 +161,11 @@ func sumInvalidIds(ranges []string) int {
 		if err != nil {
 			panic(err)
 		}
-		sum += sumInvalidIdsFromLimits(lower, upper)
+		if exactTwice {
+			sum += sumInvalidIdsPartOne(lower, upper)
+		} else {
+			sum += sumInvalidIdsPartTwo(lower, upper)
+		}
 
 	}
 	return sum
@@ -134,6 +181,19 @@ func PartOne() int {
 	if err != nil {
 		panic(err)
 	}
-	res := sumInvalidIds(input)
+	res := sumInvalidIds(input, true)
+	return res
+}
+
+func PartTwo() int {
+	file, err := filehandling.OpenFile("2gift_shop/input.txt")
+	if err != nil {
+		panic(err)
+	}
+	input, err := filehandling.ExtractSliceSep(file, ',', true)
+	if err != nil {
+		panic(err)
+	}
+	res := sumInvalidIds(input, false)
 	return res
 }

@@ -42,3 +42,15 @@ func ExtractSliceSep(rd io.Reader, sep byte, removeSep bool) ([]string, error) {
 
 	return itens, nil
 }
+
+func ExtractGrid(rd io.Reader) [][]byte {
+	scanner := bufio.NewScanner(rd)
+	grid := make([][]byte, 0, 512)
+	for scanner.Scan() {
+		bytes := scanner.Bytes()
+		line := make([]byte, len(bytes))
+		copy(line, bytes)
+		grid = append(grid, line)
+	}
+	return grid
+}

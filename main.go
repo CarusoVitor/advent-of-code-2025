@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
-	printingdepartment "github.com/CarusoVitor/advent-of-code-2025/4printing_department"
+	cafeteria "github.com/CarusoVitor/advent-of-code-2025/5cafeteria"
 )
 
 func main() {
-	fmt.Println(printingdepartment.PartTwo())
+	fmt.Println(cafeteria.PartOne())
 }

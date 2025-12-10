@@ -24,12 +24,25 @@ func isAcessable(grid [][]byte, target byte, x, y, threshold int) bool {
 	return true
 }
 
-func acessableRolls(paperGrid [][]byte) int {
+func allAcessableRolls(paperGrid [][]byte) int {
+	totalSum := 0
+	currentSum := -1
+	for currentSum != 0 {
+		currentSum = acessableRolls(paperGrid, true)
+		totalSum += currentSum
+	}
+	return totalSum
+}
+
+func acessableRolls(paperGrid [][]byte, removeRoll bool) int {
 	sum := 0
 	for x, line := range paperGrid {
 		for y, position := range line {
 			if position == '@' && isAcessable(paperGrid, '@', x, y, 4) {
 				sum++
+				if removeRoll {
+					paperGrid[x][y] = '.'
+				}
 			}
 		}
 	}
@@ -42,5 +55,14 @@ func PartOne() int {
 		panic(err)
 	}
 	grid := filehandling.ExtractGrid(file)
-	return acessableRolls(grid)
+	return acessableRolls(grid, false)
+}
+
+func PartTwo() int {
+	file, err := filehandling.OpenFile("4printing_department/input.txt")
+	if err != nil {
+		panic(err)
+	}
+	grid := filehandling.ExtractGrid(file)
+	return allAcessableRolls(grid)
 }

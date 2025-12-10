@@ -7,5 +7,5 @@ import (
 )
 
 func main() {
-	fmt.Println(printingdepartment.PartOne())
+	fmt.Println(printingdepartment.PartTwo())
 }

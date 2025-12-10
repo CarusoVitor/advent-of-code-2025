@@ -7,5 +7,5 @@ import (
 )
 
 func main() {
-	fmt.Println(cafeteria.PartOne())
+	fmt.Println(cafeteria.PartTwo())
 }

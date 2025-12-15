@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
-	trashcompactor "github.com/CarusoVitor/advent-of-code-2025/6trash_compactor"
+	laboratories "github.com/CarusoVitor/advent-of-code-2025/7laboratories"
 )
 
 func main() {
-	fmt.Println(trashcompactor.PartTwo())
+	fmt.Println(laboratories.PartOne())
 }

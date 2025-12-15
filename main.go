@@ -7,5 +7,5 @@ import (
 )
 
 func main() {
-	fmt.Println(trashcompactor.PartOne())
+	fmt.Println(trashcompactor.PartTwo())
 }

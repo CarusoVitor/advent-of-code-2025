@@ -7,5 +7,5 @@ import (
 )
 
 func main() {
-	fmt.Println(laboratories.PartOne())
+	fmt.Println(laboratories.PartTwo())
 }

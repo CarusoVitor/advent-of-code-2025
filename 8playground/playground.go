@@ -76,6 +76,10 @@ func (c circuits) sizes() []int {
 	return values
 }
 
+func (c circuits) hasConnectedEverything(goal int) bool {
+	return len(c.existing) == 1 && c.sizes()[0] == goal
+}
+
 func (c *circuits) addIntoExistingCircuit(box junctionBox, existingIdx int) {
 	c.boxes[box] = existingIdx
 }
@@ -140,7 +144,7 @@ func findMaximumDistance(pairs map[boxPair]float64) boxPair {
 
 // findNShortestPairs find the pairs that have the shortest distance
 // between them.
-func findNShortestPairs(boxes []junctionBox, n int) map[boxPair]float64 {
+func findNShortestPairs(boxes []junctionBox, n int) []boxPair {
 	shortestConnections := make(map[boxPair]float64, len(boxes))
 	maxDistancePair := boxPair{}
 	for i := range boxes {
@@ -162,12 +166,13 @@ func findNShortestPairs(boxes []junctionBox, n int) map[boxPair]float64 {
 		}
 	}
 
-	return shortestConnections
+	return mapKeys(shortestConnections)
 }
 
-func makeCircuits(pairs map[boxPair]float64) circuits {
+func makeCircuits(pairs []boxPair, n int) (circuits, boxPair) {
 	allCircuits := newCircuits()
-	for pair := range pairs {
+	lastPairConnected := boxPair{}
+	for _, pair := range pairs {
 		pairCircuit, hasPair := allCircuits.has(pair.first)
 		pairedCircuit, hasPaired := allCircuits.has(pair.second)
 		// both are in the same circuit
@@ -186,9 +191,13 @@ func makeCircuits(pairs map[boxPair]float64) circuits {
 			newCircuit := allCircuits.addIntoNewCircuit(pair.first)
 			allCircuits.addIntoExistingCircuit(pair.second, newCircuit)
 		}
+		if allCircuits.hasConnectedEverything(n) {
+			lastPairConnected = pair
+			break
+		}
 	}
 
-	return allCircuits
+	return allCircuits, lastPairConnected
 }
 
 func productTopN(values []int, n int) int {
@@ -203,7 +212,17 @@ func productTopN(values []int, n int) int {
 	return product
 }
 
-func PartOne() float64 {
+func mapKeys[K comparable, V any](values map[K]V) []K {
+	slice := make([]K, len(values))
+	i := 0
+	for key := range values {
+		slice[i] = key
+		i++
+	}
+	return slice
+}
+
+func PartOne() int {
 	file, err := filehandling.OpenFile("8playground/input.txt")
 	if err != nil {
 		panic(err)
@@ -213,6 +232,27 @@ func PartOne() float64 {
 		panic(err)
 	}
 	conns := findNShortestPairs(boxes, len(boxes))
-	allCircuits := makeCircuits(conns)
-	return float64(productTopN(allCircuits.sizes(), 3))
+	allCircuits, _ := makeCircuits(conns, len(boxes))
+	return productTopN(allCircuits.sizes(), 3)
+}
+
+func PartTwo() int {
+	file, err := filehandling.OpenFile("8playground/input.txt")
+	if err != nil {
+		panic(err)
+	}
+	boxes, err := extractJunctionBoxes(file)
+	if err != nil {
+		panic(err)
+	}
+	conns := findNShortestPairs(boxes, len(boxes)*len(boxes)-1)
+	sort.Slice(conns, func(i, j int) bool {
+		return conns[i].first.distance(
+			conns[i].second,
+		) < conns[j].first.distance(
+			conns[j].second,
+		)
+	})
+	_, lastPairConnected := makeCircuits(conns, len(boxes))
+	return lastPairConnected.first.x * lastPairConnected.second.x
 }

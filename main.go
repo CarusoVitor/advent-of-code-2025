@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
-	playground "github.com/CarusoVitor/advent-of-code-2025/8playground"
+	movietheater "github.com/CarusoVitor/advent-of-code-2025/9movie_theater"
 )
 
 func main() {
-	fmt.Println(playground.PartTwo())
+	fmt.Println(movietheater.PartOne())
 }
